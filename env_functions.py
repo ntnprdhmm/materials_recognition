@@ -1,3 +1,5 @@
+import os
+
 def get_env(file_path=".env"):
     """ read the content of the .env file,
         and put each env var in a dic
@@ -7,6 +9,8 @@ def get_env(file_path=".env"):
 
         Return the dic containing the env variables
     """
+    if not os.path.isfile(file_path):
+        raise FileNotFoundError
     env = {}
     with open(file_path, "r") as f:
         for line in f.readlines():
