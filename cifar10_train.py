@@ -43,17 +43,20 @@ import tensorflow as tf
 
 import cifar10
 
+from env_functions import get_env
+env = get_env()
+
 # flag = command line options
 # https://www.quora.com/What-are-flags-used-for-in-TensorFlow
 FLAGS = tf.app.flags.FLAGS
-tf.app.flags.DEFINE_string('train_dir', '/tmp/cifar10_train',
+tf.app.flags.DEFINE_string('train_dir', env['TRAIN_DIR'],
                            """Directory where to write event logs """
                            """and checkpoint.""")
-tf.app.flags.DEFINE_integer('max_steps', 100,
+tf.app.flags.DEFINE_integer('max_steps', env['MAX_STEPS_ON_TRAIN'],
                             """Number of batches to run.""")
 tf.app.flags.DEFINE_boolean('log_device_placement', False,
                             """Whether to log device placement.""")
-tf.app.flags.DEFINE_integer('log_frequency', 5,
+tf.app.flags.DEFINE_integer('log_frequency', env['LOG_FREQUENCY_ON_TRAIN'],
                             """How often to log results to the console.""")
 
 
