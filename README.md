@@ -17,3 +17,8 @@ to run the tests:
 ```
 python -m unittest discover
 ```
+
+## LABELS
+
+* PVC     = [0, 1]
+* OTHERS  = [1, 0]
