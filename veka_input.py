@@ -114,12 +114,13 @@ def distorted_inputs(data_dir, batch_size):
     """
     # create a list with all the jpg files of the given folder (data_dir)
     filenames = glob(data_dir + '/*.jpg')
+    print(data_dir + '/*.jpg')
     for f in filenames:
        if not tf.gfile.Exists(f):
            raise ValueError('Failed to find file: ' + f)
 
     # extract the labels of each filename in a new list
-    labels = labels = [label_from_filename(f) for f in filenames]
+    labels = [label_from_filename(f) for f in filenames]
     lv = tf.constant(labels)
     label_fifo = tf.FIFOQueue(len(filenames), tf.int32, shapes=[[]])
     label_enqueue = label_fifo.enqueue_many([lv])

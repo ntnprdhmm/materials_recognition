@@ -29,4 +29,4 @@ if __name__ == "__main__":
     # check witch function is called
     f_called = sys.argv[1]
     if f_called == "ppm_to_jpeg":
-        ppm_to_jpeg(env['TRAIN_DIR'])
+        ppm_to_jpeg(env['DATA_DIR'])
