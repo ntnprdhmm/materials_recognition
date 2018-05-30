@@ -41,7 +41,7 @@ def ppm_to_bin(folder):
         tmp = np.array(list(label) + list(r) + list(g) + list(b), np.uint8)
         out = np.concatenate((out, tmp), axis=0)
 
-    out.tofile("out.bin")
+    out.tofile(folder + "/out.bin")
 
 if __name__ == "__main__":
     # if no args provided, nothing to do so leave here

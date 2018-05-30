@@ -43,10 +43,10 @@ import tarfile
 from six.moves import urllib
 import tensorflow as tf
 
-import veka_input
-
 from env_functions import get_env
 env = get_env()
+
+import veka_input
 
 FLAGS = tf.app.flags.FLAGS
 
@@ -60,7 +60,7 @@ tf.app.flags.DEFINE_boolean('use_fp16', False,
 
 # Global constants describing the CIFAR-10 data set.
 IMAGE_SIZE = env['IMAGE_SIZE']
-NUM_CLASSES = env['NB_CLASSES']
+NUM_CLASSES = env['NUM_CLASSES']
 NUM_EXAMPLES_PER_EPOCH_FOR_TRAIN = env['NUM_EXAMPLES_PER_EPOCH_FOR_TRAIN']
 NUM_EXAMPLES_PER_EPOCH_FOR_EVAL = env['NUM_EXAMPLES_PER_EPOCH_FOR_EVAL']
 
@@ -75,7 +75,6 @@ INITIAL_LEARNING_RATE = 0.1       # Initial learning rate.
 # to differentiate the operations. Note that this prefix is removed from the
 # names of the summaries when visualizing a model.
 TOWER_NAME = 'tower'
-
 
 def _activation_summary(x):
   """Helper to create summaries for activations.
@@ -152,7 +151,6 @@ def distorted_inputs():
   """
   if not FLAGS.data_dir:
     raise ValueError('Please supply a data_dir')
-  #data_dir = os.path.join(FLAGS.data_dir, 'cifar-10-batches-bin')
   images, labels = veka_input.distorted_inputs(data_dir=env['DATA_DIR'],
                                                   batch_size=FLAGS.batch_size)
   if FLAGS.use_fp16:
