@@ -1,2 +1,4 @@
 __pycache__
 .env
+
+cifar10_data

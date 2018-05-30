@@ -43,20 +43,17 @@ import tensorflow as tf
 
 import cifar10
 
-from env_functions import get_env
-env = get_env()
-
 # flag = command line options
 # https://www.quora.com/What-are-flags-used-for-in-TensorFlow
 FLAGS = tf.app.flags.FLAGS
-tf.app.flags.DEFINE_string('train_dir', env['TRAIN_DIR'],
+tf.app.flags.DEFINE_string('train_dir', '/tmp/cifar10_train',
                            """Directory where to write event logs """
                            """and checkpoint.""")
-tf.app.flags.DEFINE_integer('max_steps', env['MAX_STEPS_ON_TRAIN'],
+tf.app.flags.DEFINE_integer('max_steps', 300,
                             """Number of batches to run.""")
 tf.app.flags.DEFINE_boolean('log_device_placement', False,
                             """Whether to log device placement.""")
-tf.app.flags.DEFINE_integer('log_frequency', env['LOG_FREQUENCY_ON_TRAIN'],
+tf.app.flags.DEFINE_integer('log_frequency', 10,
                             """How often to log results to the console.""")
 
 
@@ -68,14 +65,18 @@ def train():
     # Get images and labels for CIFAR-10.
     # Force input pipeline to CPU:0 to avoid operations sometimes ending up on
     # GPU and resulting in a slow down.
+    # images: Tensor("shuffle_batch:0", shape=(128, 24, 24, 3), dtype=float32, device=/device:CPU:0)
+    # labels: Tensor("Reshape:0", shape=(128,), dtype=int32, device=/device:CPU:0)
     with tf.device('/cpu:0'):
       images, labels = cifar10.distorted_inputs()
 
     # Build a Graph that computes the logits predictions from the
     # inference model.
+    # Tensor("softmax_linear/softmax_linear:0", shape=(128, 10 => NUM_CLASSES), dtype=float32)
     logits = cifar10.inference(images)
 
     # Calculate loss.
+    # Tensor("total_loss:0", shape=(), dtype=float32)
     loss = cifar10.loss(logits, labels)
 
     # Build a Graph that trains the model with one batch of examples and
@@ -107,7 +108,7 @@ def train():
                         'sec/batch)')
           print (format_str % (datetime.now(), self._step, loss_value,
                                examples_per_sec, sec_per_batch))
-
+    
     with tf.train.MonitoredTrainingSession(
         checkpoint_dir=FLAGS.train_dir,
         hooks=[tf.train.StopAtStepHook(last_step=FLAGS.max_steps),

@@ -4,7 +4,7 @@ from glob import glob
 from env_functions import get_env
 env = get_env()
 
-def read_veka(filename_queue, label_fifo):
+def read_veka(filename_queue):
     """Reads and parses examples.
 
     Recommendation: if you want N-way read parallelism, call this function
@@ -14,7 +14,6 @@ def read_veka(filename_queue, label_fifo):
 
     Args:
       filename_queue: A queue of strings with the filenames to read from.
-      label_fifo -- FIFOQueue -- A queue with all the labels
 
     Returns:
       An object representing a single example, with the following fields:
@@ -42,8 +41,10 @@ def read_veka(filename_queue, label_fifo):
     result.key, image_file = image_reader.read(filename_queue)
 
     # get the matching label from label_fifo
-    result.label = label_fifo.dequeue()
+    result.label = 1 # if tf.String(result.key).find("PVC") else 0
     tf.reshape(result.label, [1])
+
+    print(result.key)
 
     # Decode the image as a JPEG file, this will turn it into a Tensor of int8
     # which we can then use in training.
@@ -95,7 +96,6 @@ def _generate_image_and_label_batch(image, label, min_queue_examples,
             batch_size=batch_size,
             num_threads=num_preprocess_threads,
             capacity=min_queue_examples + 3 * batch_size)
-
     # Display the training images in the visualizer.
     tf.summary.image('images', images)
 
@@ -114,23 +114,22 @@ def distorted_inputs(data_dir, batch_size):
     """
     # create a list with all the jpg files of the given folder (data_dir)
     filenames = glob(data_dir + '/*.jpg')
-    print(data_dir + '/*.jpg')
     for f in filenames:
        if not tf.gfile.Exists(f):
            raise ValueError('Failed to find file: ' + f)
 
     # extract the labels of each filename in a new list
-    labels = [label_from_filename(f) for f in filenames]
-    lv = tf.constant(labels)
-    label_fifo = tf.FIFOQueue(len(filenames), tf.int32, shapes=[[]])
-    label_enqueue = label_fifo.enqueue_many([lv])
+    #labels = [label_from_filename(f) for f in filenames]
+    #lv = tf.constant(labels)
+    #label_fifo = tf.FIFOQueue(len(filenames), tf.int32, shapes=[[]])
+    #label_enqueue = label_fifo.enqueue_many([lv])
 
     # Create a queue that produces the filenames to read.
     filename_queue = tf.train.string_input_producer(filenames)
 
     with tf.name_scope('data_augmentation'):
         # Read examples from files in the filename queue.
-        read_input = read_veka(filename_queue, label_fifo)
+        read_input = read_veka(filename_queue)
 
         reshaped_image = tf.cast(read_input.uint8image, tf.float32)
 
@@ -167,7 +166,7 @@ def distorted_inputs(data_dir, batch_size):
         NUM_EXAMPLES_PER_EPOCH_FOR_TRAIN = 50
         min_queue_examples = int(NUM_EXAMPLES_PER_EPOCH_FOR_TRAIN *
                                  min_fraction_of_examples_in_queue)
-        print ('Filling queue with %d CIFAR images before starting to train. '
+        print ('Filling queue with %d VEKA images before starting to train. '
                'This will take a few minutes.' % min_queue_examples)
 
     # Generate a batch of images and labels by building up a queue of examples.
