@@ -3,6 +3,8 @@ from glob import glob
 import sys
 import numpy as np
 
+from tqdm import tqdm
+
 from env_functions import get_env
 env = get_env()
 
@@ -28,19 +30,23 @@ def ppm_to_bin(folder):
         Args:
             folder -- string -- path to the folder where to look
     """
-    out = np.array([], np.uint8)
-    for f in glob(folder + "/*.ppm"):
-        # open it as a .ppm file
-        im = Image.open(f)
+    filenames = glob(folder + "/*.ppm")
+    img_size = 1 + 128*128*3
+    out = [None] * (img_size * len(filenames)) 
+    j = 0
+    for i in tqdm(range(len(filenames))):
+        im = np.array(Image.open(filenames[i]))
 
-        im = (np.array(im))
-        r = im[:,:,0].flatten()
-        g = im[:,:,1].flatten()
-        b = im[:,:,2].flatten()
-        label = [1] 
-        tmp = np.array(list(label) + list(r) + list(g) + list(b), np.uint8)
-        out = np.concatenate((out, tmp), axis=0)
+        out[j] = 1 # label
+        j += 1
 
+        for k1 in range(3):
+            tmp = r = im[:,:,k1].flatten()
+            for k2 in range(128*128):
+                out[j] = tmp[k2]
+                j += 1
+
+    out = np.array(out, np.uint8)
     out.tofile(folder + "/out.bin")
 
 if __name__ == "__main__":
@@ -54,3 +60,5 @@ if __name__ == "__main__":
         ppm_to_jpeg(env['DATA_DIR'])
     elif f_called == "ppm_to_bin":
         ppm_to_bin(env['DATA_DIR'])
+    elif f_called == "ppm_to_bin2":
+        ppm_to_bin2(env['DATA_DIR'])
