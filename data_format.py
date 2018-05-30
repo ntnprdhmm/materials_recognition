@@ -1,6 +1,7 @@
 from PIL import Image, ImageFile
 from glob import glob
 import sys
+import numpy as np
 
 from env_functions import get_env
 env = get_env()
@@ -21,6 +22,27 @@ def ppm_to_jpeg(folder):
         # save a .jpg copy (change extension from 'ppm' to 'jpg')
         im.save(f[:-3] + 'jpg')
 
+def ppm_to_bin(folder):
+    """ Create a bin file from ppm files
+
+        Args:
+            folder -- string -- path to the folder where to look
+    """
+    out = np.array([], np.uint8)
+    for f in glob(folder + "/*.ppm"):
+        # open it as a .ppm file
+        im = Image.open(f)
+
+        im = (np.array(im))
+        r = im[:,:,0].flatten()
+        g = im[:,:,1].flatten()
+        b = im[:,:,2].flatten()
+        label = [1] 
+        tmp = np.array(list(label) + list(r) + list(g) + list(b), np.uint8)
+        out = np.concatenate((out, tmp), axis=0)
+
+    out.tofile("out.bin")
+
 if __name__ == "__main__":
     # if no args provided, nothing to do so leave here
     if len(sys.argv) == 1:
@@ -30,3 +52,5 @@ if __name__ == "__main__":
     f_called = sys.argv[1]
     if f_called == "ppm_to_jpeg":
         ppm_to_jpeg(env['DATA_DIR'])
+    elif f_called == "ppm_to_bin":
+        ppm_to_bin(env['DATA_DIR'])
