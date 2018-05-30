@@ -8,6 +8,21 @@ from tqdm import tqdm
 from env_functions import get_env
 env = get_env()
 
+def filename_to_label(filename):
+    """ Given a complete filename, find the label from the basename
+        and return a (1 byte) integer to encode this label
+
+        Args:
+            filename -- string
+
+        return 1 byte integer 
+    """
+    str_label = filename.split("/")[-1].split("_")[0]
+    if str_label == "PVC":
+        return 1
+    return
+
+
 def ppm_to_jpeg(folder):
     """ Find all .ppm images in the given folder and save them in .jpeg format,
         on the same folder
@@ -24,11 +39,12 @@ def ppm_to_jpeg(folder):
         # save a .jpg copy (change extension from 'ppm' to 'jpg')
         im.save(f[:-3] + 'jpg')
 
-def ppm_to_bin(folder):
+def ppm_to_bin(folder, filename_to_label):
     """ Create a bin file from ppm files
 
         Args:
             folder -- string -- path to the folder where to look
+            filename_to_label -- func -- transform the filename to an integer < 256
     """
     filenames = glob(folder + "/*.ppm")
     img_size = 1 + 128*128*3
@@ -37,7 +53,7 @@ def ppm_to_bin(folder):
     for i in tqdm(range(len(filenames))):
         im = np.array(Image.open(filenames[i]))
 
-        out[j] = 1 # label
+        out[j] = filename_to_label(filenames[i])
         j += 1
 
         for k1 in range(3):
@@ -59,6 +75,4 @@ if __name__ == "__main__":
     if f_called == "ppm_to_jpeg":
         ppm_to_jpeg(env['DATA_DIR'])
     elif f_called == "ppm_to_bin":
-        ppm_to_bin(env['DATA_DIR'])
-    elif f_called == "ppm_to_bin2":
-        ppm_to_bin2(env['DATA_DIR'])
+        ppm_to_bin(env['DATA_DIR'], filename_to_label)
