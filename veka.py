@@ -51,7 +51,7 @@ import veka_input
 FLAGS = tf.app.flags.FLAGS
 
 # Basic model parameters.
-tf.app.flags.DEFINE_integer('batch_size', 128,
+tf.app.flags.DEFINE_integer('batch_size', env['BATCH_SIZE'],
                             """Number of images to process in a batch.""")
 tf.app.flags.DEFINE_string('data_dir', env['DATA_DIR'],
                            """Path to the CIFAR-10 data directory.""")
@@ -66,10 +66,10 @@ NUM_EXAMPLES_PER_EPOCH_FOR_EVAL = env['NUM_EXAMPLES_PER_EPOCH_FOR_EVAL']
 
 
 # Constants describing the training process.
-MOVING_AVERAGE_DECAY = 0.9999     # The decay to use for the moving average.
-NUM_EPOCHS_PER_DECAY = 350.0      # Epochs after which learning rate decays.
-LEARNING_RATE_DECAY_FACTOR = 0.1  # Learning rate decay factor.
-INITIAL_LEARNING_RATE = 0.1       # Initial learning rate.
+MOVING_AVERAGE_DECAY = env['MOVING_AVERAGE_DECAY']
+NUM_EPOCHS_PER_DECAY = env['NUM_EPOCHS_PER_DECAY']
+LEARNING_RATE_DECAY_FACTOR = env['LEARNING_RATE_DECAY_FACTOR']
+INITIAL_LEARNING_RATE = env['INITIAL_LEARNING_RATE']
 
 # If a model is trained with multiple GPUs, prefix all Op names with tower_name
 # to differentiate the operations. Note that this prefix is removed from the
@@ -151,7 +151,7 @@ def distorted_inputs():
   """
   if not FLAGS.data_dir:
     raise ValueError('Please supply a data_dir')
-  images, labels = veka_input.distorted_inputs(data_dir=env['DATA_DIR'],
+  images, labels = veka_input.distorted_inputs(data_dir=FLAGS.data_dir,
                                                   batch_size=FLAGS.batch_size)
   if FLAGS.use_fp16:
     images = tf.cast(images, tf.float16)
@@ -176,7 +176,7 @@ def inputs(eval_data):
     raise ValueError('Please supply a data_dir')
   data_dir = os.path.join(FLAGS.data_dir, 'cifar-10-batches-bin')
   images, labels = veka_input.inputs(eval_data=eval_data,
-                                        data_dir=data_dir,
+                                        data_dir=FLAGS.data_dir,
                                         batch_size=FLAGS.batch_size)
   if FLAGS.use_fp16:
     images = tf.cast(images, tf.float16)

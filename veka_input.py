@@ -27,10 +27,14 @@ import tensorflow as tf
 from env_functions import get_env
 env = get_env()
 
+FLAGS = tf.app.flags.FLAGS
+tf.app.flags.DEFINE_string('data_filename', env['DATA_FILENAME'],
+                            """Name of the .bin file.""")
+
 # Process images of this size. Note that this differs from the original CIFAR
 # image size of 32 x 32. If one alters this number, then the entire model
 # architecture will change and any model would need to be retrained.
-IMAGE_SIZE = 115
+IMAGE_SIZE = env['PROCESS_IMAGE_SIZE']
 
 # Global constants describing the CIFAR-10 data set.
 NUM_CLASSES = env["NUM_CLASSES"]
@@ -151,7 +155,7 @@ def distorted_inputs(data_dir, batch_size):
     images: Images. 4D tensor of [batch_size, IMAGE_SIZE, IMAGE_SIZE, 3] size.
     labels: Labels. 1D tensor of [batch_size] size.
   """
-  filenames = [os.path.join(data_dir, 'out.bin')]
+  filenames = [os.path.join(data_dir, FLAGS.data_filename)]
   for f in filenames:
     if not tf.gfile.Exists(f):
       raise ValueError('Failed to find file: ' + f)
