@@ -20,7 +20,7 @@ def filename_to_label(filename):
     str_label = filename.split("/")[-1].split("_")[0]
     if str_label == "PVC":
         return 1
-    return
+    return 0
 
 
 def ppm_to_jpeg(folder):
@@ -47,17 +47,16 @@ def ppm_to_bin(folder, filename_to_label):
             filename_to_label -- func -- transform the filename to an integer < 256
     """
     filenames = glob(folder + "/*.ppm")
+    #img_size = 1 + 49167# 1 + 128*128*3
     img_size = 1 + 128*128*3
-    out = [None] * (img_size * len(filenames)) 
-    j = 0
+    out = [None] * (img_size * len(filenames))
+    j = 0 
     for i in tqdm(range(len(filenames))):
         im = np.array(Image.open(filenames[i]))
-
         out[j] = filename_to_label(filenames[i])
         j += 1
-
         for k1 in range(3):
-            tmp = r = im[:,:,k1].flatten()
+            tmp = im[:,:,k1].flatten()
             for k2 in range(128*128):
                 out[j] = tmp[k2]
                 j += 1
