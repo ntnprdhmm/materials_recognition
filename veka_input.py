@@ -28,8 +28,10 @@ from env_functions import get_env
 env = get_env()
 
 FLAGS = tf.app.flags.FLAGS
-tf.app.flags.DEFINE_string('data_filename', env['DATA_FILENAME'],
-                            """Name of the .bin file.""")
+tf.app.flags.DEFINE_string('train_data_filename', env['TRAIN_DATA_FILENAME'],
+                            """Name of the train .bin file.""")
+tf.app.flags.DEFINE_string('test_data_filename', env['TEST_DATA_FILENAME'],
+                            """Name of the test .bin file.""")
 
 # Process images of this size. Note that this differs from the original CIFAR
 # image size of 32 x 32. If one alters this number, then the entire model
@@ -155,7 +157,7 @@ def distorted_inputs(data_dir, batch_size):
     images: Images. 4D tensor of [batch_size, IMAGE_SIZE, IMAGE_SIZE, 3] size.
     labels: Labels. 1D tensor of [batch_size] size.
   """
-  filenames = [os.path.join(data_dir, FLAGS.data_filename)]
+  filenames = [os.path.join(data_dir, FLAGS.train_data_filename)]
   for f in filenames:
     if not tf.gfile.Exists(f):
       raise ValueError('Failed to find file: ' + f)
@@ -224,10 +226,10 @@ def inputs(eval_data, data_dir, batch_size):
   if not eval_data:
     #filenames = [os.path.join(data_dir, 'data_batch_%d.bin' % i)
     #            for i in xrange(1, 6)]
-    filenames = [os.path.join(data_dir, 'out.bin')]
+    filenames = [os.path.join(data_dir, FLAGS.train_data_filename)]
     num_examples_per_epoch = NUM_EXAMPLES_PER_EPOCH_FOR_TRAIN
   else:
-    filenames = [os.path.join(data_dir, 'out.bin')]
+    filenames = [os.path.join(data_dir, FLAGS.test_data_filename)]
     num_examples_per_epoch = NUM_EXAMPLES_PER_EPOCH_FOR_EVAL
 
   for f in filenames:

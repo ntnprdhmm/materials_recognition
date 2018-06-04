@@ -22,23 +22,6 @@ def filename_to_label(filename):
         return 1
     return 0
 
-
-def ppm_to_jpeg(folder):
-    """ Find all .ppm images in the given folder and save them in .jpeg format,
-        on the same folder
-
-        Args:
-            folder -- string -- path to the folder where to look
-    """
-    # to fix OSError: image file is truncated
-    ImageFile.LOAD_TRUNCATED_IMAGES = True
-    # for each .ppm image in the folder
-    for f in glob(folder + "/*.ppm"):
-        # open it as a .ppm file
-        im = Image.open(f)
-        # save a .jpg copy (change extension from 'ppm' to 'jpg')
-        im.save(f[:-3] + 'jpg')
-
 def ppm_to_bin(folder, filename_to_label):
     """ Create a bin file from ppm files
 
@@ -61,8 +44,14 @@ def ppm_to_bin(folder, filename_to_label):
                 out[j] = tmp[k2]
                 j += 1
 
-    out = np.array(out, np.uint8)
-    out.tofile(folder + "/out.bin")
+    nb_images_for_train = int(len(filenames) * (1 - env["TEST_DATA_PERCENTAGE"]))
+    end_of_train = nb_images_for_train * img_size
+
+    train_out = np.array(out[:end_of_train], np.uint8)
+    train_out.tofile(folder + "/" + env["TRAIN_DATA_FILENAME"])
+
+    test_out = np.array(out[end_of_train:], np.uint8)
+    test_out.tofile(folder + "/" + env["TEST_DATA_FILENAME"])
 
 if __name__ == "__main__":
     # if no args provided, nothing to do so leave here
