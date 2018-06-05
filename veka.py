@@ -60,7 +60,7 @@ tf.app.flags.DEFINE_boolean('use_fp16', False,
 
 # Global constants describing the CIFAR-10 data set.
 IMAGE_SIZE = env['IMAGE_SIZE']
-NUM_CLASSES = env['NUM_CLASSES']
+NUM_CLASSES = len(env['TRAIN_DATA_FILENAME'].split('_')) - 1
 NUM_EXAMPLES_PER_EPOCH_FOR_TRAIN = env['NUM_EXAMPLES_PER_EPOCH_FOR_TRAIN']
 NUM_EXAMPLES_PER_EPOCH_FOR_EVAL = env['NUM_EXAMPLES_PER_EPOCH_FOR_EVAL']
 

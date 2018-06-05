@@ -82,10 +82,10 @@ def ppm_to_bin(folder, dataset_type, dic):
     end_of_train = nb_images_for_train * img_size
 
     train_out = np.array(out[:end_of_train], np.uint8)
-    train_out.tofile(folder + "/" + dataset_type + "_" + env["TRAIN_DATA_FILENAME_SUFFIX"])
+    train_out.tofile(folder + "/" + dataset_type + "_train.bin")
 
     test_out = np.array(out[end_of_train:], np.uint8)
-    test_out.tofile(folder + "/" + dataset_type + "_" + env["TEST_DATA_FILENAME_SUFFIX"])
+    test_out.tofile(folder + "/" + dataset_type + "_test.bin")
 
 if __name__ == "__main__":
     # if no args provided, nothing to do so leave here
