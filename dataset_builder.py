@@ -55,11 +55,12 @@ def pvc_joint_glass_wood_pePaPs_other():
         PS_LABEL: 5,
     }
 
-def ppm_to_bin(folder, dic):
+def ppm_to_bin(folder, dataset_type, dic):
     """ Create a bin file from ppm files
 
         Args:
             folder -- string -- path to the folder where to look
+            dataset_type -- string -- contains the classes names of the dataset
             dic -- func -- dic used to transform filename to 1 byte interger label
     """
     filenames = glob(folder + "/*.ppm")
@@ -81,10 +82,10 @@ def ppm_to_bin(folder, dic):
     end_of_train = nb_images_for_train * img_size
 
     train_out = np.array(out[:end_of_train], np.uint8)
-    train_out.tofile(folder + "/" + env["TRAIN_DATA_FILENAME"])
+    train_out.tofile(folder + "/" + dataset_type + "_" + env["TRAIN_DATA_FILENAME_SUFFIX"])
 
     test_out = np.array(out[end_of_train:], np.uint8)
-    test_out.tofile(folder + "/" + env["TEST_DATA_FILENAME"])
+    test_out.tofile(folder + "/" + dataset_type + "_" + env["TEST_DATA_FILENAME_SUFFIX"])
 
 if __name__ == "__main__":
     # if no args provided, nothing to do so leave here
@@ -94,8 +95,8 @@ if __name__ == "__main__":
     # check witch function is called
     f = sys.argv[1]
     if f == "pvc_vs_all" or f == "1":
-        ppm_to_bin(env['DATA_DIR'], pvc_vs_all())
+        ppm_to_bin(env['DATA_DIR'], "pvc_vs_all", pvc_vs_all())
     elif f == "pvc_joint_glass_wood_other" or f == "2":
-        ppm_to_bin(env['DATA_DIR'], pvc_joint_glass_wood_other())
+        ppm_to_bin(env['DATA_DIR'], "pvc_joint_glass_wood_other", pvc_joint_glass_wood_other())
     elif f == "pvc_joint_glass_wood_pepaps_other" or f == "3":
-        ppm_to_bin(env['DATA_DIR'], pvc_joint_glass_wood_pePaPs_other())
+        ppm_to_bin(env['DATA_DIR'], "pvc_joint_glass_wood_pepaps_other", pvc_joint_glass_wood_pePaPs_other())
