@@ -3,3 +3,5 @@ __pycache__
 
 cifar10_data
 out.bin
+
+*.pyc
