@@ -15,10 +15,5 @@ To convert all **.ppm** images to **.jpg** take a look at **data_format.py**.
 
 to run the tests:
 ```
-python -m unittest discover
+python3 -m unittest discover
 ```
-
-## LABELS
-
-* PVC     = [0, 1]
-* OTHERS  = [1, 0]

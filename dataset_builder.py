@@ -8,26 +8,59 @@ from tqdm import tqdm
 from env_functions import get_env
 env = get_env()
 
-def filename_to_label(filename):
+PVC_LABEL = "pvc"
+JOINT_LABEL = "joint"
+GLASS_LABEL = "verre"
+WOOD_LABEL = "bois"
+PE_LABEL = "pe"
+PA_LABEL = "pa"
+PS_LABEL = "ps"
+
+def labelize(filename, dic):
     """ Given a complete filename, find the label from the basename
         and return a (1 byte) integer to encode this label
 
         Args:
-            filename -- string
+            filename -- string -- the filename to labelize
+            dic -- dictionary -- match a string label to an integer label
 
         return 1 byte integer 
     """
-    str_label = filename.split("/")[-1].split("_")[0]
-    if str_label == "PVC":
-        return 1
-    return 0
+    str_label = (filename.split("/")[-1].split("_")[0]).lower()
+    if str_label in dic:
+        return dic[str_label] 
+    return 0 # other
 
-def ppm_to_bin(folder, filename_to_label):
+def pvc_vs_all():
+    return {
+        PVC_LABEL: 1
+    }
+
+def pvc_joint_glass_wood_other():
+    return {
+        PVC_LABEL: 1,
+        JOINT_LABEL: 2,
+        GLASS_LABEL: 3,
+        WOOD_LABEL: 4
+    }
+
+def pvc_joint_glass_wood_pePaPs_other():
+    return {
+        PVC_LABEL: 1,
+        JOINT_LABEL: 2,
+        GLASS_LABEL: 3,
+        WOOD_LABEL: 4,
+        PE_LABEL: 5,
+        PA_LABEL: 5,
+        PS_LABEL: 5,
+    }
+
+def ppm_to_bin(folder, dic):
     """ Create a bin file from ppm files
 
         Args:
             folder -- string -- path to the folder where to look
-            filename_to_label -- func -- transform the filename to an integer < 256
+            dic -- func -- dic used to transform filename to 1 byte interger label
     """
     filenames = glob(folder + "/*.ppm")
     #img_size = 1 + 49167# 1 + 128*128*3
@@ -36,7 +69,7 @@ def ppm_to_bin(folder, filename_to_label):
     j = 0 
     for i in tqdm(range(len(filenames))):
         im = np.array(Image.open(filenames[i]))
-        out[j] = filename_to_label(filenames[i])
+        out[j] = labelize(filenames[i], dic)
         j += 1
         for k1 in range(3):
             tmp = im[:,:,k1].flatten()
@@ -59,8 +92,10 @@ if __name__ == "__main__":
          sys.exit()
 
     # check witch function is called
-    f_called = sys.argv[1]
-    if f_called == "ppm_to_jpeg":
-        ppm_to_jpeg(env['DATA_DIR'])
-    elif f_called == "ppm_to_bin":
-        ppm_to_bin(env['DATA_DIR'], filename_to_label)
+    f = sys.argv[1]
+    if f == "pvc_vs_all" or f == "1":
+        ppm_to_bin(env['DATA_DIR'], pvc_vs_all())
+    elif f == "pvc_joint_glass_wood_other" or f == "2":
+        ppm_to_bin(env['DATA_DIR'], pvc_joint_glass_wood_other())
+    elif f == "pvc_joint_glass_wood_pepaps_other" or f == "3":
+        ppm_to_bin(env['DATA_DIR'], pvc_joint_glass_wood_pePaPs_other())
