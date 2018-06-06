@@ -59,6 +59,14 @@ tf.app.flags.DEFINE_boolean('log_device_placement', False,
 tf.app.flags.DEFINE_integer('log_frequency', env['LOG_FREQUENCY_ON_TRAIN'],
                             """How often to log results to the console.""")
 
+# import the right inference function
+# each problem has his own CNN structure
+if env['DATASET_TYPE'] == "pvc_joint_glass_wood_other":
+  from inference_2 import inference
+elif env['DATASET_TYPE'] == "pvc_joint_glass_wood_pepaps_other":
+  from inference_3 import inference
+else:
+  from inference_1 import inference # pvc_vs_all per default
 
 def train():
   """Train CIFAR-10 for a number of steps."""
@@ -76,7 +84,7 @@ def train():
     # Build a Graph that computes the logits predictions from the
     # inference model.
     # Tensor("softmax_linear/softmax_linear:0", shape=(128, 10 => NUM_CLASSES), dtype=float32)
-    logits = veka.inference(images)
+    logits = inference(images)
 
     # Calculate loss.
     # Tensor("total_loss:0", shape=(), dtype=float32)

@@ -57,6 +57,15 @@ tf.app.flags.DEFINE_integer('num_examples', env['NUM_EXAMPLES_ON_EVAL'],
 tf.app.flags.DEFINE_boolean('run_once', False,
                          """Whether to run eval only once.""")
 
+# import the right inference function
+# each problem has his own CNN structure
+if env['DATASET_TYPE'] == "pvc_joint_glass_wood_other":
+  from inference_2 import inference
+elif env['DATASET_TYPE'] == "pvc_joint_glass_wood_pepaps_other":
+  from inference_3 import inference
+else:
+  from inference_1 import inference # pvc_vs_all per default
+
 def eval_once(saver, summary_writer, top_k_op, summary_op):
   """Run Eval once.
   Args:
@@ -119,7 +128,7 @@ def evaluate():
 
     # Build a Graph that computes the logits predictions from the
     # inference model.
-    logits = veka.inference(images)
+    logits = inference(images)
 
     # Calculate predictions.
     top_k_op = tf.nn.in_top_k(logits, labels, 1)

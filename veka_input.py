@@ -28,9 +28,9 @@ from env_functions import get_env
 env = get_env()
 
 FLAGS = tf.app.flags.FLAGS
-tf.app.flags.DEFINE_string('train_data_filename', env['TRAIN_DATA_FILENAME'],
+tf.app.flags.DEFINE_string('train_data_filename', env['DATASET_TYPE'] + "_train.bin",
                             """Name of the train .bin file.""")
-tf.app.flags.DEFINE_string('test_data_filename', env['TEST_DATA_FILENAME'],
+tf.app.flags.DEFINE_string('test_data_filename', env['DATASET_TYPE'] + "_test.bin",
                             """Name of the test .bin file.""")
 
 # Process images of this size. Note that this differs from the original CIFAR
@@ -39,7 +39,7 @@ tf.app.flags.DEFINE_string('test_data_filename', env['TEST_DATA_FILENAME'],
 IMAGE_SIZE = env['PROCESS_IMAGE_SIZE']
 
 # Global constants describing the CIFAR-10 data set.
-NUM_CLASSES = len(env['TRAIN_DATA_FILENAME'].split('_')) - 1
+NUM_CLASSES = len(env['DATASET_TYPE'].split('_'))
 NUM_EXAMPLES_PER_EPOCH_FOR_TRAIN = env["NUM_EXAMPLES_PER_EPOCH_FOR_TRAIN"]
 NUM_EXAMPLES_PER_EPOCH_FOR_EVAL = env["NUM_EXAMPLES_PER_EPOCH_FOR_EVAL"]
 
