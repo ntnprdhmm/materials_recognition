@@ -6,10 +6,17 @@ rename the **.env.example** file at the project's root to **.env** and fill it w
 
 *your can search the variable directly in the code to know where it's used*
 
-## CHANGE INPUT IMAGES FORMAT
+## BUILD THE DATASETS
 
-Images has to be in **.jpg** format.
-To convert all **.ppm** images to **.jpg** take a look at **data_format.py**.
+```
+python3 dataset_builder.py <1|2|3>
+```
+
+* **1** to create a **PVC vs all** dataset
+* **2** to create a **PVC vs wood vs glass vs joint vs other** dataset
+* **3** to create a **PVC vs wood vs glass vs joint vs PE/PA/PS vs other** dataset
+
+For each dataset, there will be a **train** and a **test** *.bin* file created.
 
 ## TESTS
 
