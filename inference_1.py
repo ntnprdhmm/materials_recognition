@@ -64,27 +64,47 @@ def inference(images):
   pool2 = tf.nn.max_pool(norm2, ksize=[1, env["POOL_GRID_LEN"], env["POOL_GRID_LEN"], 1], 
                          strides=[1, env["POOL_STEP"], env["POOL_STEP"], 1],
                          padding='SAME', name='pool2')
+  
+ # conv3
+  with tf.variable_scope('conv3') as scope:
+    kernel = veka._variable_with_weight_decay('weights',
+                                         shape=[env["CONV_GRID_LEN"], env["CONV_GRID_LEN"], env["CONV_OUTPUT"], env["CONV_OUTPUT"]],
+                                         stddev=5e-2,
+                                         wd=None)
+    conv = tf.nn.conv2d(pool2, kernel, [1, env["CONV_STEP"], env["CONV_STEP"], 1], padding='SAME')
+    biases = veka._variable_on_cpu('biases', [env["CONV_OUTPUT"]], tf.constant_initializer(0.1))
+    pre_activation = tf.nn.bias_add(conv, biases)
+    conv2 = tf.nn.relu(pre_activation, name=scope.name)
+    veka._activation_summary(conv3)
 
-  # local3
-  with tf.variable_scope('local3') as scope:
+  # norm3
+  norm2 = tf.nn.lrn(conv3, 4, bias=1.0, alpha=0.001 / 9.0, beta=0.75,
+                    name='norm3')
+  # pool3
+  pool2 = tf.nn.max_pool(norm3, ksize=[1, env["POOL_GRID_LEN"], env["POOL_GRID_LEN"], 1], 
+                         strides=[1, env["POOL_STEP"], env["POOL_STEP"], 1],
+                         padding='SAME', name='pool3') 
+
+  # local4
+  with tf.variable_scope('local4') as scope:
     # Move everything into depth so we can perform a single matrix multiply.
-    reshape = tf.reshape(pool2, [images.get_shape().as_list()[0], -1])
+    reshape = tf.reshape(pool3, [images.get_shape().as_list()[0], -1])
     dim = reshape.get_shape()[1].value
     weights = veka._variable_with_weight_decay('weights', 
                                           shape=[dim, SHAPE_FINAL],
                                           stddev=0.04, wd=0.004)
     biases = veka._variable_on_cpu('biases', [SHAPE_FINAL], tf.constant_initializer(0.1))
     local3 = tf.nn.relu(tf.matmul(reshape, weights) + biases, name=scope.name)
-    veka._activation_summary(local3)
+    veka._activation_summary(local4)
 
-  # local4
-  with tf.variable_scope('local4') as scope:
+  # local5
+  with tf.variable_scope('local5') as scope:
     weights = veka._variable_with_weight_decay('weights', 
                                           shape=[SHAPE_FINAL, LOCAL_OUTOUT],
                                           stddev=0.04, wd=0.004)
     biases = veka._variable_on_cpu('biases', [LOCAL_OUTOUT], tf.constant_initializer(0.1))
-    local4 = tf.nn.relu(tf.matmul(local3, weights) + biases, name=scope.name)
-    veka._activation_summary(local4)
+    local4 = tf.nn.relu(tf.matmul(local4, weights) + biases, name=scope.name)
+    veka._activation_summary(local5)
 
   # linear layer(WX + b),
   # We don't apply softmax here because
