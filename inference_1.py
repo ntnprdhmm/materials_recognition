@@ -74,14 +74,14 @@ def inference(images):
     conv = tf.nn.conv2d(pool2, kernel, [1, env["CONV_STEP"], env["CONV_STEP"], 1], padding='SAME')
     biases = veka._variable_on_cpu('biases', [env["CONV_OUTPUT"]], tf.constant_initializer(0.1))
     pre_activation = tf.nn.bias_add(conv, biases)
-    conv2 = tf.nn.relu(pre_activation, name=scope.name)
+    conv3 = tf.nn.relu(pre_activation, name=scope.name)
     veka._activation_summary(conv3)
 
   # norm3
-  norm2 = tf.nn.lrn(conv3, 4, bias=1.0, alpha=0.001 / 9.0, beta=0.75,
+  norm3 = tf.nn.lrn(conv3, 4, bias=1.0, alpha=0.001 / 9.0, beta=0.75,
                     name='norm3')
   # pool3
-  pool2 = tf.nn.max_pool(norm3, ksize=[1, env["POOL_GRID_LEN"], env["POOL_GRID_LEN"], 1], 
+  pool3 = tf.nn.max_pool(norm3, ksize=[1, env["POOL_GRID_LEN"], env["POOL_GRID_LEN"], 1], 
                          strides=[1, env["POOL_STEP"], env["POOL_STEP"], 1],
                          padding='SAME', name='pool3') 
 
@@ -94,7 +94,7 @@ def inference(images):
                                           shape=[dim, SHAPE_FINAL],
                                           stddev=0.04, wd=0.004)
     biases = veka._variable_on_cpu('biases', [SHAPE_FINAL], tf.constant_initializer(0.1))
-    local3 = tf.nn.relu(tf.matmul(reshape, weights) + biases, name=scope.name)
+    local4 = tf.nn.relu(tf.matmul(reshape, weights) + biases, name=scope.name)
     veka._activation_summary(local4)
 
   # local5
@@ -103,7 +103,7 @@ def inference(images):
                                           shape=[SHAPE_FINAL, LOCAL_OUTOUT],
                                           stddev=0.04, wd=0.004)
     biases = veka._variable_on_cpu('biases', [LOCAL_OUTOUT], tf.constant_initializer(0.1))
-    local4 = tf.nn.relu(tf.matmul(local4, weights) + biases, name=scope.name)
+    local5 = tf.nn.relu(tf.matmul(local4, weights) + biases, name=scope.name)
     veka._activation_summary(local5)
 
   # linear layer(WX + b),
@@ -115,7 +115,7 @@ def inference(images):
                                           stddev=1/LOCAL_OUTOUT, wd=None)
     biases = veka._variable_on_cpu('biases', [NUM_CLASSES],
                               tf.constant_initializer(0.0))
-    softmax_linear = tf.add(tf.matmul(local4, weights), biases, name=scope.name)
+    softmax_linear = tf.add(tf.matmul(local5, weights), biases, name=scope.name)
     veka._activation_summary(softmax_linear)
 
   return softmax_linear
